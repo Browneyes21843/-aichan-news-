@@ -1,7 +1,7 @@
 {
   "format": "myradio/character-1",
   "type": "clips",
-  "idle": "aichan.png",
+  "idle": "aichan-fullframe.png",
   "talk": [],
   "background": "#808080"
 }
