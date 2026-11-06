@@ -613,11 +613,34 @@ const loadImg = (src, tries = 2) => new Promise((ok, ng) => { const i = new Imag
 async function initSprites() {
   const [w, h] = CHAR.size;
   SP.base = await loadImg(CHAR.base);
+  SP.key = null;
   SP.depth = CHAR.depth ? await loadImg(CHAR.depth).catch(() => null) : null;
   SP.parts = {};
   // a part that does not load is left out (that eye or mouth just does not change), not the whole character
   await Promise.all(Object.entries(CHAR.parts || {}).map(async ([k, p]) => {
-    const img = await loadImg(p.src).catch(() => null); if (img) SP.parts[k] = { img, x: p.x, y: p.y }; }));
+    let img = await loadImg(p.src).catch(() => null);
+    if (img && p.crop) {
+      // Extract only the animated region while rendering; preserve the base portrait.
+      const [sx, sy, sw, sh] = p.crop;
+      const patch = Object.assign(document.createElement("canvas"), { width: sw, height: sh });
+      const pc = patch.getContext("2d");
+      pc.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+      const f = Math.min(p.feather || 0, sw / 2, sh / 2);
+      if (f > 0) {
+        pc.globalCompositeOperation = "destination-in";
+        for (const [x0, y0, x1, y1] of [[0, 0, sw, 0], [0, 0, 0, sh]]) {
+          const g = pc.createLinearGradient(x0, y0, x1, y1);
+          const edge = f / (x1 || y1);
+          g.addColorStop(0, "rgba(0,0,0,0)");
+          g.addColorStop(edge, "#000");
+          g.addColorStop(1 - edge, "#000");
+          g.addColorStop(1, "rgba(0,0,0,0)");
+          pc.fillStyle = g; pc.fillRect(0, 0, sw, sh);
+        }
+      }
+      img = patch;
+    }
+    if (img) SP.parts[k] = { img, x: p.x, y: p.y }; }));
   SP.comp = Object.assign(document.createElement("canvas"), { width: w, height: h });
   SP.cx = SP.comp.getContext("2d");
   const cv = $("charcv"); cv.width = w; cv.height = h; cv.hidden = false;
@@ -1265,3 +1288,4 @@ init();
 </script>
 </body>
 </html>
+

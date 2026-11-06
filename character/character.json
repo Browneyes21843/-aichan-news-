@@ -1,7 +1,14 @@
 {
   "format": "myradio/character-1",
-  "type": "clips",
-  "idle": "aichan-fullframe.png",
-  "talk": [],
-  "background": "#808080"
+  "type": "sprites",
+  "size": [1354, 1161],
+  "background": "#808080",
+  "base": "aichan-fullframe.png",
+  "parts": {
+    "mouth_half": {"src": "aichan-mouth-half.png", "x": 614, "y": 452, "crop": [614, 452, 145, 95], "feather": 12},
+    "mouth_open": {"src": "aichan-mouth-open.png", "x": 614, "y": 452, "crop": [614, 452, 145, 95], "feather": 12},
+    "blink": {"src": "aichan-blink.png", "x": 545, "y": 323, "crop": [545, 323, 280, 58], "feather": 8}
+  },
+  "mouth": {"1": "mouth_half", "2": "mouth_open"},
+  "eye": {"blink": "blink"}
 }
